@@ -76,17 +76,13 @@ class Im2ColConvolution : public BaseConvolution<BorderMode>
       Im2ColConvolution::InitalizeOutput(inputPadded, filter, output, dW, dH,
           dilationW, dilationH, outMaps);
 
-    MatType im2row(output.n_rows * output.n_cols, filter.n_rows *
-        filter.n_cols * input.n_slices, GetFillType<MatType>::none);
+    MatType im2row(filter.n_rows * filter.n_cols * input.n_slices,
+        output.n_rows * output.n_cols, GetFillType<MatType>::none);
     // Arrange im2row so that each row has patches from each input map.
     for (size_t i = 0; i < input.n_slices; ++i)
     {
-      MatType im2rowSv;
-      MakeAlias(im2rowSv, im2row, output.n_rows * output.n_cols,
-          filter.n_rows * filter.n_cols, output.n_rows *
-          output.n_cols * filter.n_rows * filter.n_cols * i);
-      Im2Row(inputPadded.slice(i), im2rowSv, filter.n_rows, filter.n_cols,
-          dW, dH, dilationW, dilationH);
+      Im2Row(inputPadded.slice(i), im2row, filter.n_rows, filter.n_cols,
+          filter.n_rows * filter.n_cols * i, dW, dH, dilationW, dilationH);
     }
 
     // The filters already have the correct order in memory, just reshape it.
@@ -98,7 +94,7 @@ class Im2ColConvolution : public BaseConvolution<BorderMode>
     MatType tempOutput;
     MakeAlias(tempOutput, output, output.n_rows * output.n_cols, outMaps);
 
-    tempOutput += im2row * fil2col;
+    tempOutput += trans(im2row) * fil2col;
   }
 
   /**
@@ -136,9 +132,9 @@ class Im2ColConvolution : public BaseConvolution<BorderMode>
       Im2ColConvolution::InitalizeOutput(inputPadded, filter, output, dW, dH,
           dilationW, dilationH, filter.n_slices);
 
-    MatType im2row(output.n_rows * output.n_cols, filter.n_rows *
-        filter.n_cols, GetFillType<MatType>::none);
-    Im2Row(inputPadded, im2row, filter.n_rows, filter.n_cols, dW, dH,
+    MatType im2row(filter.n_rows * filter.n_cols, output.n_rows * output.n_cols,
+        GetFillType<MatType>::none);
+    Im2Row(inputPadded, im2row, filter.n_rows, filter.n_cols, 0, dW, dH,
         dilationW, dilationH);
 
     // The filters already have the correct order in memory, just reshape it.
@@ -150,7 +146,7 @@ class Im2ColConvolution : public BaseConvolution<BorderMode>
     MakeAlias(tempOutput, output, output.n_rows * output.n_cols,
         filter.n_slices);
 
-    tempOutput += im2row * fil2col;
+    tempOutput += trans(im2row) * fil2col;
   }
  private:
   /**
@@ -171,6 +167,7 @@ class Im2ColConvolution : public BaseConvolution<BorderMode>
                      MatType& im2row,
                      const size_t filterRows,
                      const size_t filterCols,
+                     const size_t startRow = 0,
                      const size_t dW = 1,
                      const size_t dH = 1,
                      const size_t dilationW = 1,
@@ -185,15 +182,15 @@ class Im2ColConvolution : public BaseConvolution<BorderMode>
     {
       for (size_t i = 0; i < outputRows; i++)
       {
-        size_t nRow = j * outputRows + i;
-        size_t nCol = 0;
+        size_t nCol = j * outputRows + i;
+        size_t nRow = startRow;
         for (size_t kj = 0; kj < filterCols; kj++)
         {
           for (size_t ki = 0; ki < filterRows; ki++)
           {
             im2row.at(nRow, nCol) = input.at(i * dH + ki * dilationH,
                 j * dW + kj * dilationW);
-            nCol++;
+            nRow++;
           }
         }
       }
