@@ -92,6 +92,21 @@ bool LoadImage(const std::vector<std::string>& files,
   return true;
 }
 
+#if defined(MLPACK_HAS_COOT)
+
+template<typename eT>
+bool LoadImage(const std::vector<std::string>& files,
+               coot::Mat<eT>& matrix,
+               ImageOptions& opts)
+{
+  arma::Mat<eT> armaMatrix;
+  bool success = LoadImage(files, armaMatrix, opts);
+  matrix = ConvTo<coot::Mat<eT>>::From(armaMatrix);
+  return success;
+}
+
+#endif // defined(MLPACK_HAS_COOT)
+
 } // namespace mlpack
 
 #endif

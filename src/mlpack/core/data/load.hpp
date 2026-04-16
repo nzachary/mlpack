@@ -112,6 +112,18 @@ bool Load(const std::vector<std::string>& files,
           const typename std::enable_if_t<
               IsDataOptions<DataOptionsType>::value>* = 0);
 
+#if defined(MLPACK_HAS_COOT)
+
+template<typename eT, typename DataOptionsType>
+bool Load(const std::vector<std::string>& files,
+          coot::Mat<eT>& matrix,
+          DataOptionsType& opts,
+          const bool copyBack = true,
+          const typename std::enable_if_t<
+              IsDataOptions<DataOptionsType>::value>* = 0);
+
+#endif // defined(MLPACK_HAS_COOT)
+
 } // namespace mlpack
 
 // Include implementation of Load() for matrix.

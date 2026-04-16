@@ -54,11 +54,12 @@ bool Load(const std::string& src,
 {
   Timer::Start("loading_data");
 
-  static_assert(!IsArma<ObjectType>::value || !IsSparseMat<ObjectType>::value
-      || !HasSerialize<ObjectType>::value, "mlpack can load Armadillo"
-      " matrices or serialized mlpack models only; please use a known type.");
+  static_assert(IsArma<ObjectType>::value || IsCoot<ObjectType>::value
+      || IsSparseMat<ObjectType>::value || HasSerialize<ObjectType>::value,
+      "mlpack can load Armadillo or Bandicoot matrices or serialized mlpack"
+      "models only; please use a known type.");
   const bool isMatrixType = IsArma<ObjectType>::value ||
-      IsSparseMat<ObjectType>::value;
+      IsCoot<ObjectType>::value || IsSparseMat<ObjectType>::value;
   const bool isSerializable = HasSerialize<ObjectType>::value;
   const bool isSparseMatrixType = IsSparseMat<ObjectType>::value;
 
@@ -203,6 +204,24 @@ bool Load(const std::vector<std::string>& files,
   }
   return success;
 }
+
+#if defined(MLPACK_HAS_COOT)
+
+template<typename eT, typename DataOptionsType>
+bool Load(const std::vector<std::string>& files,
+          coot::Mat<eT>& matrix,
+          const DataOptionsType& opts,
+          const typename std::enable_if_t<
+              IsDataOptions<DataOptionsType>::value>*)
+{
+  DataOptionsType tmpOpts(opts);
+  arma::Mat<eT> armaMatrix;
+  bool success = Load(files, matrix, tmpOpts, false);
+  matrix = ConvTo<coot::Mat<eT>>::From(armaMatrix);
+  return success;
+}
+
+#endif // defined(MLPACK_HAS_COOT)
 
 } // namespace mlpack
 

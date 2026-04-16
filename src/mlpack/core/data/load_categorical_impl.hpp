@@ -447,6 +447,21 @@ bool LoadCategorical(const std::string& filename,
   return true;
 }
 
+#if defined(MLPACK_HAS_COOT)
+
+template<typename eT>
+bool LoadCategorical(const std::string& filename,
+                     coot::Mat<eT>& matrix,
+                     TextOptions& opts)
+{
+  arma::Mat<eT> armaMatrix;
+  bool success = LoadCategorical(filename, armaMatrix, opts);
+  matrix = ConvTo<coot::Mat<eT>>::From(armaMatrix);
+  return success;
+}
+
+#endif // defined(MLPACK_HAS_COOT)
+
 } // namespace mlpack
 
 #endif

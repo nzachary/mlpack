@@ -347,6 +347,23 @@ bool LoadARFF(const std::string& filename,
   return true;
 }
 
+#if defined(MLPACK_HAS_COOT)
+
+template<typename eT, typename PolicyType>
+bool LoadARFF(const std::string& filename,
+              coot::Mat<eT>& matrix,
+              DatasetMapper<PolicyType>& info,
+              bool fatal,
+              bool transpose)
+{
+  arma::Mat<eT> armaMatrix;
+  bool success = LoadARFF(filename, armaMatrix, info, fatal, transpose);
+  matrix = ConvTo<coot::Mat<eT>>::From(armaMatrix);
+  return success;
+}
+
+#endif // defined(MLPACK_HAS_COOT)
+
 } // namespace mlpack
 
 #endif

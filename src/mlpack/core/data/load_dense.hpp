@@ -235,9 +235,9 @@ bool LoadDenseRow(const std::string& filename,
   }
 }
 
-template<typename MatType>
+template<typename eT>
 bool LoadDense(const std::string& filename,
-               MatType& matrix,
+               arma::Mat<eT>& matrix,
                TextOptions& opts,
                std::fstream& stream)
 {
@@ -273,6 +273,57 @@ bool LoadDense(const std::string& filename,
   }
   return success;
 }
+
+#if defined(MLPACK_HAS_COOT)
+
+template<typename eT, typename DataOptionsType>
+bool LoadHDF5(const std::string& filename,
+              coot::Mat<eT>& matrix,
+              const DataOptionsBase<DataOptionsType>& opts)
+{
+  arma::Mat<eT> armaMatrix;
+  bool success = LoadHDF5(filename, armaMatrix, opts);
+  matrix = ConvTo<coot::Mat<eT>>::From(armaMatrix);
+  return success;
+}
+
+template<typename eT>
+bool LoadDenseCol(const std::string& filename,
+                  coot::Col<eT>& vec,
+                  TextOptions& opts,
+                  std::fstream& stream)
+{
+  arma::Col<eT> armaVec;
+  bool success = LoadHDF5(filename, armaVec, opts, stream);
+  vec = ConvTo<coot::Col<eT>>::From(armaVec);
+  return success;
+}
+
+template<typename eT>
+bool LoadDenseRow(const std::string& filename,
+                  coot::Row<eT>& rowvec,
+                  TextOptions& opts,
+                  std::fstream& stream)
+{
+  arma::Row<eT> armaRowvec;
+  bool success = LoadHDF5(filename, armaRowvec, opts, stream);
+  rowvec = ConvTo<coot::Row<eT>>::From(armaRowvec);
+  return success;
+}
+
+template<typename eT>
+bool LoadDense(const std::string& filename,
+               coot::Mat<eT>& matrix,
+               TextOptions& opts,
+               std::fstream& stream)
+{
+  arma::Mat<eT> armaMatrix;
+  bool success = LoadDense(filename, armaMatrix, opts, stream);
+  matrix = ConvTo<coot::Mat<eT>>::From(armaMatrix);
+  return success;
+}
+
+#endif
 
 } // namespace mlpack
 

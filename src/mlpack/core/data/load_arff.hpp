@@ -19,16 +19,6 @@
 namespace mlpack {
 
 /**
- * A utility function to load an ARFF dataset as numeric features (that is, as
- * an Armadillo matrix without any modification).  An exception will be thrown
- * if any features are non-numeric.
- */
-template<typename eT>
-bool LoadARFF(const std::string& filename,
-              arma::Mat<eT>& matrix,
-              bool transpose);
-
-/**
  * A utility function to load an ARFF dataset as numeric and categorical
  * features, using the DatasetInfo structure for mapping.  An exception will be
  * thrown upon failure.
@@ -56,6 +46,17 @@ bool LoadARFF(const std::string& filename,
               DatasetMapper<PolicyType>& info,
               bool fatal,
               bool transpose);
+
+#if defined(MLPACK_HAS_COOT)
+
+template<typename eT, typename PolicyType>
+bool LoadARFF(const std::string& filename,
+              coot::Mat<eT>& matrix,
+              DatasetMapper<PolicyType>& info,
+              bool fatal,
+              bool transpose);
+
+#endif // defined(MLPACK_HAS_COOT)
 
 } // namespace mlpack
 

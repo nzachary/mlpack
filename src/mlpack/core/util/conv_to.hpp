@@ -14,6 +14,8 @@
 #ifndef MLPACK_CORE_UTIL_CONV_TO_HPP
 #define MLPACK_CORE_UTIL_CONV_TO_HPP
 
+#include "coot_traits.hpp"
+
 namespace mlpack {
 
 /**
@@ -35,8 +37,8 @@ class ConvTo
   template<typename InputType>
   inline static OutputType From(const InputType& input,
                                 const typename std::enable_if_t<
-                                    coot::is_coot_type<InputType>::value ||
-                                    coot::is_coot_type<OutputType>::value>* = 0)
+                                    IsCoot<InputType>::value ||
+                                    IsCoot<OutputType>::value>* = 0)
   {
     return coot::conv_to<OutputType>::from(input);
   }
@@ -50,8 +52,8 @@ class ConvTo
   template<typename InputType>
   inline static OutputType From(const InputType& input,
                                 const typename std::enable_if_t<
-                                    arma::is_arma_type<InputType>::value ||
-                                    arma::is_arma_type<OutputType>::value>* = 0)
+                                    !IsCoot<InputType>::value &&
+                                    !IsCoot<OutputType>::value>* = 0)
   {
     return arma::conv_to<OutputType>::from(input);
   }

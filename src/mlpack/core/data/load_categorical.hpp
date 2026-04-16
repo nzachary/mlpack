@@ -262,6 +262,15 @@ bool LoadCategorical(const std::string& filename,
                      arma::Mat<eT>& matrix,
                      TextOptions& opts);
 
+#if defined(MLPACK_HAS_COOT)
+
+template<typename eT>
+bool LoadCategorical(const std::string& filename,
+                     coot::Mat<eT>& matrix,
+                     TextOptions& opts);
+
+#endif // defined(MLPACK_HAS_COOT)
+
 } // namespace mlpack
 
 #include "load_categorical_impl.hpp"

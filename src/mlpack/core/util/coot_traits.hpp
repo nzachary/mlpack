@@ -84,6 +84,24 @@ struct IsCube<coot::Cube<eT> >
   static const bool value = true;
 };
 
+template<typename eT>
+struct IsCol<coot::Col<eT>>
+{
+  constexpr static bool value = true;
+};
+
+template<typename eT>
+struct IsRow<coot::Row<eT>>
+{
+  constexpr static bool value = true;
+};
+
+template<typename eT>
+struct IsDense<coot::Mat<eT>>
+{
+  constexpr static bool value = true;
+};
+
 #else
 
 template<typename T>
