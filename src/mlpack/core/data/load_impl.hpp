@@ -30,9 +30,9 @@ bool Load(const std::string& filename,
   return Load(filename, matrix, tmpOpts, false);
 }
 
-template<typename eT, typename DataOptionsType>
+template<typename MatType, typename DataOptionsType>
 bool Load(const std::vector<std::string>& files,
-          arma::Mat<eT>& matrix,
+          MatType& matrix,
           const DataOptionsType& opts,
           const typename std::enable_if_t<
               IsDataOptions<DataOptionsType>::value>*)
@@ -166,9 +166,9 @@ bool Load(const std::string& src,
   return success;
 }
 
-template<typename eT, typename DataOptionsType>
+template<typename ObjectType, typename DataOptionsType>
 bool Load(const std::vector<std::string>& files,
-          arma::Mat<eT>& matrix,
+          ObjectType& matrix,
           DataOptionsType& opts,
           const bool copyBack,
           const typename std::enable_if_t<
@@ -181,7 +181,7 @@ bool Load(const std::vector<std::string>& files,
         " loading failed.", opts);
   }
 
-  DetectFromExtension<arma::Mat<eT>>(files.back(), opts);
+  DetectFromExtension<ObjectType>(files.back(), opts);
   const bool isImageFormat = (opts.Format() == FileType::PNG ||
       opts.Format() == FileType::JPG || opts.Format() == FileType::PNM ||
       opts.Format() == FileType::BMP || opts.Format() == FileType::GIF ||
@@ -204,24 +204,6 @@ bool Load(const std::vector<std::string>& files,
   }
   return success;
 }
-
-#if defined(MLPACK_HAS_COOT)
-
-template<typename eT, typename DataOptionsType>
-bool Load(const std::vector<std::string>& files,
-          coot::Mat<eT>& matrix,
-          const DataOptionsType& opts,
-          const typename std::enable_if_t<
-              IsDataOptions<DataOptionsType>::value>*)
-{
-  DataOptionsType tmpOpts(opts);
-  arma::Mat<eT> armaMatrix;
-  bool success = Load(files, matrix, tmpOpts, false);
-  matrix = ConvTo<coot::Mat<eT>>::From(armaMatrix);
-  return success;
-}
-
-#endif // defined(MLPACK_HAS_COOT)
 
 } // namespace mlpack
 

@@ -80,9 +80,9 @@ bool Load(const std::string& filename,
  * @param opts DataOptions to be passed to the function
  * @return Boolean value indicating success or failure of load.
  */
-template<typename eT, typename DataOptionsType>
+template<typename MatType, typename DataOptionsType>
 bool Load(const std::vector<std::string>& files,
-          arma::Mat<eT>& matrix,
+          MatType& matrix,
           const DataOptionsType& opts,
           const typename std::enable_if_t<
               IsDataOptions<DataOptionsType>::value>* = 0);
@@ -104,25 +104,13 @@ bool Load(const std::vector<std::string>& files,
  * @param opts DataOptions to be passed to the function
  * @return Boolean value indicating success or failure of load.
  */
-template<typename eT, typename DataOptionsType>
+template<typename MatType, typename DataOptionsType>
 bool Load(const std::vector<std::string>& files,
-          arma::Mat<eT>& matrix,
+          MatType& matrix,
           DataOptionsType& opts,
           const bool copyBack = true,
           const typename std::enable_if_t<
               IsDataOptions<DataOptionsType>::value>* = 0);
-
-#if defined(MLPACK_HAS_COOT)
-
-template<typename eT, typename DataOptionsType>
-bool Load(const std::vector<std::string>& files,
-          coot::Mat<eT>& matrix,
-          DataOptionsType& opts,
-          const bool copyBack = true,
-          const typename std::enable_if_t<
-              IsDataOptions<DataOptionsType>::value>* = 0);
-
-#endif // defined(MLPACK_HAS_COOT)
 
 } // namespace mlpack
 
